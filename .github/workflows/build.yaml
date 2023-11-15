@@ -14,6 +14,10 @@ jobs:
       
       - uses: docker/setup-buildx-action@v3
       
+      - name: Get nginx-unprivileged base image tag
+        id: image-tag
+        run: echo "TAG_NAME=$(python .github/workflows/get_tag.py)" >> "$GITHUB_OUTPUT"
+      
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -28,8 +32,7 @@ jobs:
           images: |
             name=ghcr.io/unraid/nginx-otel
           tags: |
-            type=raw,value=1.25.3-alpine3.18-slim
-      # IMPORTANT: Manual tag version!
+            type=raw,value=${{ steps.image-tag.outputs.TAG_NAME }}
       
       - name: Build and push NGINX image
         uses: docker/build-push-action@v5

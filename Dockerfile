@@ -1,5 +1,4 @@
 FROM docker.io/library/alpine:3.18.4 as otel-module-builder
-# IMPORTANT FOR CI/CD: Remember to bump the tag version in .github/build.yaml when bumping this tag!
 
 WORKDIR /opt
 
