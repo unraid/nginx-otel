@@ -19,7 +19,7 @@ The only change is that the `ngx_otel_module.so` module is installed and loaded,
 enabling NGINX to send trace data to OpenTelemetry.
 
 Image tags are identical to those published by nginx-unprivileged, we track against the alpine3.18-slim series.
-We only build for amd64 architecture.
+We build for both amd64 and arm64 architectures.
 
 ## Configuring the NGINX OpenTelemetry module
 Documentation for configuring the NGINX OpenTelemetry module can be found
