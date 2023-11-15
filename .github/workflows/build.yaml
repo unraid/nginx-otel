@@ -34,7 +34,7 @@ jobs:
       - name: Build and push NGINX image
         uses: docker/build-push-action@v5
         with:
-          file: configs/nginx.Dockerfile
+          file: Dockerfile
           push: true
           tags: ${{ steps.meta-nginx.outputs.tags }}
           labels: ${{ steps.meta-nginx.outputs.labels }}
