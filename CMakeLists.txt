@@ -1,4 +1,6 @@
-cmake_minimum_required(VERSION 3.16.3)
+# Modified CMake config to skip compiling grpc and protobuf, fix opentelemetry build, as well as disable cmake <3.24 workaround
+
+cmake_minimum_required(VERSION 3.24.0)
 project(nginx-otel)
 
 set(NGX_OTEL_NGINX_BUILD_DIR ""
@@ -15,56 +17,36 @@ endif()
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-if(NGX_OTEL_FETCH_DEPS)
-    include(FetchContent)
+include(FetchContent)
 
-    FetchContent_Declare(
-        grpc
-        GIT_REPOSITORY https://github.com/grpc/grpc
-        GIT_TAG        18dda3c586b2607d8daead6b97922e59d867bb7d # v1.46.6
-        GIT_SUBMODULES third_party/protobuf third_party/abseil-cpp
-        GIT_SHALLOW    ON)
+FetchContent_Declare(
+    otelcpp
+    GIT_REPOSITORY https://github.com/open-telemetry/opentelemetry-cpp
+    GIT_TAG        57bf8c2b0e85215a61602f559522d08caa4d2fb8 # v1.8.1
+    GIT_SUBMODULES third_party/opentelemetry-proto
+    GIT_SHALLOW    ON)
 
-    set(gRPC_USE_PROTO_LITE ON  CACHE INTERNAL "")
-    set(gRPC_INSTALL        OFF CACHE INTERNAL "")
-    set(gRPC_CARES_PROVIDER package CACHE INTERNAL "")
-    set(gRPC_RE2_PROVIDER   package CACHE INTERNAL "")
-    set(gRPC_SSL_PROVIDER   package CACHE INTERNAL "")
-    set(gRPC_ZLIB_PROVIDER  package CACHE INTERNAL "")
+set(BUILD_TESTING OFF CACHE INTERNAL "")
+set(WITH_EXAMPLES OFF CACHE INTERNAL "")
+set(WITH_ABSEIL ON CACHE INTERNAL "")
 
-    FetchContent_Declare(
-        otelcpp
-        GIT_REPOSITORY https://github.com/open-telemetry/opentelemetry-cpp
-        GIT_TAG        57bf8c2b0e85215a61602f559522d08caa4d2fb8 # v1.8.1
-        GIT_SUBMODULES third_party/opentelemetry-proto
-        GIT_SHALLOW    ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
 
-    set(BUILD_TESTING OFF CACHE INTERNAL "")
-    set(WITH_EXAMPLES OFF CACHE INTERNAL "")
+FetchContent_MakeAvailable(otelcpp)
 
-    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-    set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
+set_property(DIRECTORY ${otelcpp_SOURCE_DIR}
+             PROPERTY EXCLUDE_FROM_ALL YES)
 
-    FetchContent_MakeAvailable(grpc otelcpp)
-
-    set_property(DIRECTORY ${grpc_SOURCE_DIR}
-                 PROPERTY EXCLUDE_FROM_ALL YES)
-    set_property(DIRECTORY ${otelcpp_SOURCE_DIR}
-                 PROPERTY EXCLUDE_FROM_ALL YES)
-
-    if(NOT NGX_OTEL_PROTO_DIR)
-        set(NGX_OTEL_PROTO_DIR
-            "${otelcpp_SOURCE_DIR}/third_party/opentelemetry-proto")
-    endif()
-
-    add_library(opentelemetry-cpp::trace ALIAS opentelemetry_trace)
-    add_library(gRPC::grpc++ ALIAS grpc++)
-    add_executable(gRPC::grpc_cpp_plugin ALIAS grpc_cpp_plugin)
-else()
-    find_package(opentelemetry-cpp REQUIRED)
-    find_package(protobuf REQUIRED)
-    find_package(gRPC REQUIRED)
+if(NOT NGX_OTEL_PROTO_DIR)
+    set(NGX_OTEL_PROTO_DIR
+        "${otelcpp_SOURCE_DIR}/third_party/opentelemetry-proto")
 endif()
+
+add_library(opentelemetry-cpp::trace ALIAS opentelemetry_trace)
+
+find_package(Protobuf REQUIRED)
+find_package(gRPC REQUIRED)
 
 set(PROTO_DIR ${NGX_OTEL_PROTO_DIR})
 set(PROTOS
@@ -109,9 +91,6 @@ add_library(ngx_otel_module MODULE
 
 # avoid 'lib' prefix in binary name
 set_target_properties(ngx_otel_module PROPERTIES PREFIX "")
-
-# can't use OTel's WITH_ABSEIL until cmake 3.24, as it triggers find_package()
-target_compile_definitions(ngx_otel_module PRIVATE HAVE_ABSEIL)
 
 target_include_directories(ngx_otel_module PRIVATE
     ${NGX_OTEL_NGINX_BUILD_DIR}
