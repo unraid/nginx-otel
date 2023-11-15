@@ -1,4 +1,5 @@
 # Modified CMake config to skip compiling grpc and protobuf, fix opentelemetry build, as well as disable cmake <3.24 workaround
+# See https://github.com/nginxinc/nginx-otel/issues/16
 
 cmake_minimum_required(VERSION 3.24.0)
 project(nginx-otel)
