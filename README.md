@@ -22,7 +22,8 @@ Image tags are identical to those published by nginx-unprivileged, we track agai
 We only build for amd64 architecture.
 
 ## Configuring the NGINX OpenTelemetry module
-Documentation for configuring the NGINX OpenTelemetry module can be found here.
+Documentation for configuring the NGINX OpenTelemetry module can be found
+[here](https://docs.nginx.com/nginx/admin-guide/dynamic-modules/opentelemetry/).
 
 # License
 [Apache License, Version 2.0](https://github.com/unraid/nginx-otel/blob/main/LICENSE)
