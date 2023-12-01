@@ -1,4 +1,4 @@
-FROM docker.io/library/alpine:3.18.4 as otel-module-builder
+FROM docker.io/library/alpine:3.18.5 as otel-module-builder
 
 WORKDIR /opt
 
