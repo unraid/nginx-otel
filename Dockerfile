@@ -18,7 +18,7 @@ WORKDIR /opt/nginx-otel/build
 RUN cmake -DNGX_OTEL_NGINX_BUILD_DIR=/opt/nginx/objs ..
 RUN make -j 8
 
-FROM docker.io/nginxinc/nginx-unprivileged:1.25.3-alpine3.18-slim
+FROM docker.io/nginxinc/nginx-unprivileged:1.25.4-alpine3.18-slim
 
 USER 0
 RUN apk add --no-cache grpc grpc-cpp
