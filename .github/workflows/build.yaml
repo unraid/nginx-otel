@@ -31,7 +31,7 @@ jobs:
 
       - name: Configure docker metadata  # https://docs.docker.com/build/ci/github-actions/manage-tags-labels/
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
             name=ghcr.io/unraid/nginx-otel
