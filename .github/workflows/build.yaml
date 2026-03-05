@@ -16,7 +16,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       
       - name: Get nginx-unprivileged base image tag
         id: image-tag
